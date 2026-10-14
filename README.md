@@ -4,8 +4,27 @@ En WeSports-utvecklardator, beskriven i ett repo: vilka program, vilka repon,
 vilka gemensamma regler och skills Claude ska ha. En ny dator blir en klon och
 ett script, och det någon lägger till får alla med `git pull`.
 
-Enklast: ge Claude Code länken till `INSTALL-FOR-CLAUDE.md` och be den sätta
-upp datorn.
+## Kom igång
+
+Öppna PowerShell, klistra in en rad och tryck Enter. Raden installerar git,
+GitHub CLI, Claude Code och Herdr, och startar sedan Claude med uppdraget.
+Claude gör resten; du loggar bara in i webbläsaren när den ber om det.
+
+**Ny dator:**
+
+```powershell
+'Git.Git','GitHub.cli','Anthropic.ClaudeCode','Herdr.Herdr.Preview' | % { winget install -e --id $_ --accept-source-agreements --accept-package-agreements }; $env:Path=[Environment]::GetEnvironmentVariable('Path','Machine')+';'+[Environment]::GetEnvironmentVariable('Path','User'); claude "Det här är min NYA dator. Logga in mig på GitHub, klona Wesports-Scandinavia-AB/ws-dev-env till ~/source/repos/ws-dev-env och följ INSTALL-FOR-CLAUDE.md i repot. Jag är inte utvecklare: kör allt själv och be mig aldrig klistra in kommandon."
+```
+
+**Gamla datorn**, innan du lämnar den:
+
+```powershell
+'Git.Git','GitHub.cli','Anthropic.ClaudeCode','Herdr.Herdr.Preview' | % { winget install -e --id $_ --accept-source-agreements --accept-package-agreements }; $env:Path=[Environment]::GetEnvironmentVariable('Path','Machine')+';'+[Environment]::GetEnvironmentVariable('Path','User'); claude "Jag ska byta dator och det här är den GAMLA. Logga in mig på GitHub, klona Wesports-Scandinavia-AB/ws-dev-env till ~/source/repos/ws-dev-env och följ avsnittet Den gamla datorn i INSTALL-FOR-CLAUDE.md. Jag är inte utvecklare: kör allt själv och fråga innan du ändrar något."
+```
+
+Första gången Claude startar loggar du in på ditt Claude-konto.
+
+## Innehåll
 
 ```
 bootstrap.ps1   ny dator, eller uppdatera en befintlig; går att köra om

@@ -4,9 +4,18 @@ Den här filen är skriven till dig, Claude, inte till människan du hjälper. N
 har gett dig länken för att få sin dator uppsatt för utveckling på WeSports,
 eller för att flytta från en gammal dator.
 
-Följ stegen i ordning. Kör kommandona själv och förklara kort vad som händer.
-Personen är inte nödvändigtvis utvecklare: förklara på vanlig svenska, be inte
-hen skriva kommandon, och fråga innan du committar, pushar eller tar bort något.
+Följ stegen i ordning och förklara kort vad som händer. Personen är inte
+nödvändigtvis utvecklare: förklara på vanlig svenska, och fråga innan du
+committar, pushar eller tar bort något.
+
+**Kör varje kommando själv.** Be aldrig personen klistra in något i PowerShell
+eller en terminal, och be hen inte öppna en ny terminal. Hen ska bara läsa,
+logga in i webbläsaren och svara på frågor. Saknas ett program som nyss
+installerats, läs in PATH igen i ditt eget anrop:
+
+```
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+```
 
 ## 0. Förutsättningar
 
@@ -31,7 +40,8 @@ winget install --id Git.Git -e --accept-package-agreements --accept-source-agree
 winget install --id GitHub.cli -e --accept-package-agreements --accept-source-agreements
 ```
 
-Starta en ny terminalsession så att `git` och `gh` hittas. Kör sedan
+Startraden i README:n har oftast redan installerat dem; winget hoppar då över
+dem. Läs in PATH igen (se ovan). Kör sedan
 `gh auth login --hostname github.com --git-protocol https --web` i bakgrunden,
 ge personen engångskoden och adressen som text och vänta tills hen loggat in.
 Personen behöver tillgång till organisationen `Wesports-Scandinavia-AB`.
@@ -67,7 +77,6 @@ Saknar git namn eller e-post varnar scriptet. Fråga personen och sätt dem.
 
 Varje dator loggar in för sig, inget kopieras:
 
-- **Claude Code**: `claude` i en ny terminal.
 - **wsg**: `python -m wsg graph login` i bakgrunden, ge personen adressen.
 - **SSH**: scriptet skrev ut den publika nyckeln. Den läggs in på servrarna,
   helst från den gamla datorn (se skillen `ws-dev-env`).
