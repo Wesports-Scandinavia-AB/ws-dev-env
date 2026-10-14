@@ -1,0 +1,5 @@
+# Repos everyone gets, one owner/name per line. Your own go in your personal
+# layer's repos.txt (see README).
+Wesports-Scandinavia-AB/ws-dev-env
+Wesports-Scandinavia-AB/wesports-arena
+Wesports-Scandinavia-AB/wesports-data
