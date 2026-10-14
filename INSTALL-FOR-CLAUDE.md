@@ -5,6 +5,8 @@ har gett dig länken för att få sin dator uppsatt för utveckling på WeSports
 eller för att flytta från en gammal dator.
 
 Följ stegen i ordning. Kör kommandona själv och förklara kort vad som händer.
+Personen är inte nödvändigtvis utvecklare: förklara på vanlig svenska, be inte
+hen skriva kommandon, och fråga innan du committar, pushar eller tar bort något.
 
 ## 0. Förutsättningar
 
@@ -16,12 +18,11 @@ personens egen webbläsare.
 
 Upplägget gäller Windows. På en Mac: säg det och stanna.
 
-## 1. Flyttar personen från en annan dator?
+## 1. Gammal eller ny dator?
 
-Fråga. Finns den gamla datorn kvar, börja där: läs avsnittet "Byta dator" i
-`claude/skills/ws-dev-env/SKILL.md` och kör `check.ps1` på den gamla datorn
-innan något görs på den nya. Det som bara finns på den gamla datorn ska vara
-pushat eller flyttat innan den lämnas.
+Fråga om det här är datorn personen ska **lämna** eller den **nya**. Steg 2 och
+3 gäller båda. Är det den gamla, gå sedan till "Den gamla datorn" längst ner i
+stället för steg 4.
 
 ## 2. git och GitHub
 
@@ -77,3 +78,40 @@ Varje dator loggar in för sig, inget kopieras:
 Kör `pnpm install` i de repon som har `package.json`. Berätta sedan vad som
 installerats, vad som återstår (inloggningar, SSH-nyckeln på servrarna) och att
 "uppdatera dev-miljön" räcker för att hämta det andra lagt till.
+
+## Den gamla datorn
+
+Här installeras ingenting. Målet är att inget går förlorat när datorn lämnas.
+
+1. Kör kontrollen. Ligger repona inte i `~/source/repos`, ge `-Root`:
+
+   ```
+   powershell -ExecutionPolicy Bypass -File "$HOME\sourceepos\ws-dev-env\check.ps1"
+   ```
+
+2. Gå igenom det **gula** med personen, en sak i taget, och förklara vad det är:
+   - **Inte committat / inte pushat**: visa vad som ändrats och fråga om det ska
+     sparas. Ska det det, committa och pusha på en egen gren och berätta vilken.
+   - **Filer som ser ut som hemligheter** (`.env`, `.dev.vars`): de flyttas inte
+     via git, OneDrive eller mail. Skicka dem till personen själv med
+     `python -m wsg secret`, en engångslänk, och be hen öppna den på den nya
+     datorn. Saknas wsg, installera det enligt
+     https://github.com/Wesports-Scandinavia-AB/wsg-cli/blob/main/INSTALL-FOR-CLAUDE.md
+   - **Mappar utan git eller utan remote**: fråga om de behövs. Behövs de, lägg
+     dem i ett privat GitHub-repo eller i OneDrive om de inte innehåller hemligheter.
+3. Kör kontrollen igen tills den slutar med **"Nothing lost"**. Säg först då att
+   datorn kan lämnas.
+4. Det **blå** är påminnelser. Claude-minnet per projekt kan kopieras till
+   `~/.claude/projects` på den nya datorn om personen vill. SSH-nycklarna
+   flyttas inte, se nästa punkt.
+5. **SSH**: när den nya datorn har en nyckel (bootstrap skriver ut den publika
+   delen) och personen ger dig den raden, lägg in den på servrarna härifrån med
+   den gamla nyckeln:
+
+   ```
+   ssh <användare>@<server> "echo '<publik nyckel>' >> ~/.ssh/authorized_keys"
+   ```
+
+   Användare och server hittar du i `~/.ssh/config` eller `~/.ssh/known_hosts`,
+   annars fråga. Be personen testa från den nya datorn, och ta sedan bort den
+   gamla datorns rad ur `authorized_keys` på servern.
