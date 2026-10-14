@@ -86,7 +86,7 @@ Här installeras ingenting. Målet är att inget går förlorat när datorn läm
 1. Kör kontrollen. Ligger repona inte i `~/source/repos`, ge `-Root`:
 
    ```
-   powershell -ExecutionPolicy Bypass -File "$HOME\sourceepos\ws-dev-env\check.ps1"
+   powershell -ExecutionPolicy Bypass -File "$HOME\source\repos\ws-dev-env\check.ps1"
    ```
 
 2. Gå igenom det **gula** med personen, en sak i taget, och förklara vad det är:
