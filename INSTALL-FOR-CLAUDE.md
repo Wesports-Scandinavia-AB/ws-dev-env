@@ -78,6 +78,9 @@ Saknar git namn eller e-post varnar scriptet. Fråga personen och sätt dem.
 Varje dator loggar in för sig, inget kopieras:
 
 - **wsg**: `python -m wsg graph login` i bakgrunden, ge personen adressen.
+  Scriptet la `wsg` i PATH, men ditt eget fönster startade innan dess, så
+  `python -m wsg` är formen som fungerar direkt. I personens nya terminal
+  heter det bara `wsg`.
 - **SSH**: scriptet skrev ut den publika nyckeln. Den läggs in på servrarna,
   helst från den gamla datorn (se skillen `ws-dev-env`).
 - **Cloudflare**, när det behövs: `npx wrangler login` i det repo som använder det.

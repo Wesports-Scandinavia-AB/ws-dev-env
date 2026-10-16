@@ -39,6 +39,24 @@ function Refresh-Path {
 
 function Has($cmd) { [bool](Get-Command $cmd -ErrorAction SilentlyContinue) }
 
+# Adds a folder to the user's PATH for good, not just this window. Written
+# through the registry so that entries like %USERPROFILE% stay unexpanded;
+# [Environment]::SetEnvironmentVariable would write them out in full.
+function Add-UserPath($dir) {
+    if (-not $dir -or -not (Test-Path $dir)) { return }
+    $key = Get-Item 'HKCU:\Environment'
+    $raw = $key.GetValue('Path', '', 'DoNotExpandEnvironmentNames')
+    if (($raw -split ';') -contains $dir.TrimEnd('\')) { return }
+    # Keep the value's own type: PATH is normally REG_EXPAND_SZ, and writing it
+    # back as REG_SZ would stop any %VAR% in it from expanding.
+    $kind = try { $key.GetValueKind('Path') } catch { 'ExpandString' }
+    Act "add $dir to your PATH" {
+        $value = if ($raw) { "$raw;$dir" } else { $dir }
+        Set-ItemProperty -Path 'HKCU:\Environment' -Name Path -Value $value -Type $kind
+    }
+    $env:Path += ";$dir"
+}
+
 # Layers: this repo, then the personal one once it is cloned.
 function Layers {
     $l = @($here)
@@ -124,11 +142,23 @@ foreach ($layer in Layers) {
 }
 
 # wsg: Microsoft 365, Teams, Arena and one-time secret links, with its own skill.
-python -m wsg --version *> $null
-if ($LASTEXITCODE -ne 0) {
-    Act 'install wsg-cli' { python -m pip install --user --upgrade git+https://github.com/Wesports-Scandinavia-AB/wsg-cli }
+Step 'wsg-cli'
+if (-not (Has 'python')) {
+    Write-Warning "python is missing, so wsg-cli was skipped. Open a new terminal and run this script again."
+} else {
+    python -m wsg --version *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Act 'pip install wsg-cli' { python -m pip install --user --upgrade git+https://github.com/Wesports-Scandinavia-AB/wsg-cli }
+    } else {
+        Write-Host '   exists: wsg-cli (update it with: wsg update)'
+    }
+    # pip --user puts wsg.exe in a Scripts folder the Python installer leaves
+    # off PATH, so the bare 'wsg' the rules and the skill use would not run.
+    if (-not (Has 'wsg')) {
+        Add-UserPath (python -c "import sysconfig; print(sysconfig.get_path('scripts', 'nt_user'))")
+    }
+    if (-not (Test-Path (Join-Path $skills 'wsg'))) { Act 'wsg skill install' { python -m wsg skill install } }
 }
-if (-not (Test-Path (Join-Path $skills 'wsg'))) { Act 'wsg skill install' { python -m wsg skill install } }
 
 # --- 5. SSH key for this computer --------------------------------------------
 Step 'SSH key'
@@ -151,8 +181,8 @@ if (Test-Path "$key.pub") {
 if (-not $DryRun) { Save-DevEnvConfig $config }
 
 Step 'Installed'
-foreach ($cmd in 'git', 'gh', 'node', 'pnpm', 'python', 'code', 'claude', 'herdr') {
+foreach ($cmd in 'git', 'gh', 'node', 'pnpm', 'python', 'wsg', 'code', 'claude', 'herdr') {
     if (Has $cmd) { Write-Host "   OK       $cmd" -ForegroundColor Green }
     else { Write-Host "   MISSING  $cmd  (open a new terminal and run again)" -ForegroundColor Yellow }
 }
-Write-Host "`nNext: open a new terminal, run 'claude' and log in, then 'python -m wsg graph login'." -ForegroundColor Cyan
+Write-Host "`nNext: open a new terminal, run 'claude' and log in, then 'wsg graph login'." -ForegroundColor Cyan
