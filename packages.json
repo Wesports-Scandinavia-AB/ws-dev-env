@@ -1,26 +1,13 @@
 {
-  "$schema": "https://aka.ms/winget-packages.schema.2.0.json",
-  "CreationDate": "2026-10-14T00:00:00.000-00:00",
-  "Sources": [
-    {
-      "Packages": [
-        { "PackageIdentifier": "Git.Git" },
-        { "PackageIdentifier": "GitHub.cli" },
-        { "PackageIdentifier": "OpenJS.NodeJS.LTS" },
-        { "PackageIdentifier": "Python.Python.3.12" },
-        { "PackageIdentifier": "Microsoft.VisualStudioCode" },
-        { "PackageIdentifier": "Microsoft.WindowsTerminal" },
-        { "PackageIdentifier": "Anthropic.ClaudeCode" },
-        { "PackageIdentifier": "Anthropic.Claude" },
-        { "PackageIdentifier": "Herdr.Herdr.Preview" }
-      ],
-      "SourceDetails": {
-        "Argument": "https://cdn.winget.microsoft.com/cache",
-        "Identifier": "Microsoft.Winget.Source_8wekyb3d8bbwe",
-        "Name": "winget",
-        "Type": "Microsoft.PreIndexed.Package"
-      }
-    }
-  ],
-  "WinGetVersion": "1.29.380"
+  "packages": [
+    { "name": "git", "winget": "Git.Git", "brew": "git" },
+    { "name": "gh", "winget": "GitHub.cli", "brew": "gh" },
+    { "name": "node", "winget": "OpenJS.NodeJS.LTS", "brew": "node" },
+    { "name": "python", "winget": "Python.Python.3.12", "brew": "python@3.12" },
+    { "name": "vscode", "winget": "Microsoft.VisualStudioCode", "brew": "visual-studio-code", "cask": true },
+    { "name": "windows-terminal", "winget": "Microsoft.WindowsTerminal" },
+    { "name": "claude-code", "winget": "Anthropic.ClaudeCode", "brew": "claude-code", "cask": true },
+    { "name": "claude-desktop", "winget": "Anthropic.Claude", "brew": "claude", "cask": true },
+    { "name": "herdr", "winget": "Herdr.Herdr.Preview", "brew": "herdr" }
+  ]
 }

@@ -25,15 +25,21 @@ Kan du inte det, säg det och stanna.
 **Be aldrig om lösenord, kod eller token i chatten.** Inloggningar sker i
 personens egen webbläsare.
 
-Upplägget gäller Windows. På en Mac: säg det och stanna.
+Upplägget gäller Windows och Mac. På Linux: säg det och stanna.
 
-## 1. Gammal eller ny dator?
+## 1. Vilken plattform, och gammal eller ny dator?
 
-Fråga om det här är datorn personen ska **lämna** eller den **nya**. Steg 2 och
-3 gäller båda. Är det den gamla, gå sedan till "Den gamla datorn" längst ner i
-stället för steg 4.
+Kör `uname` (Mac/Linux svarar `Darwin`/`Linux`) eller titta efter `$env:OS` på
+Windows, om det inte redan är tydligt. Är det Linux: säg det och stanna.
+
+Fråga sedan om det här är datorn personen ska **lämna** eller den **nya**.
+Steg 2 och 3 gäller båda. Är det den gamla, gå till "Den gamla datorn" längst
+ner i stället för steg 4; på Mac finns där ännu bara Windows-kontrollen
+(`check.ps1`), se anmärkningen i det avsnittet.
 
 ## 2. git och GitHub
+
+**Windows:**
 
 ```
 winget install --id Git.Git -e --accept-package-agreements --accept-source-agreements
@@ -41,35 +47,68 @@ winget install --id GitHub.cli -e --accept-package-agreements --accept-source-ag
 ```
 
 Startraden i README:n har oftast redan installerat dem; winget hoppar då över
-dem. Läs in PATH igen (se ovan). Kör sedan
-`gh auth login --hostname github.com --git-protocol https --web` i bakgrunden,
-ge personen engångskoden och adressen som text och vänta tills hen loggat in.
-Personen behöver tillgång till organisationen `Wesports-Scandinavia-AB`.
+dem. Läs in PATH igen (se ovan).
+
+**Mac:**
+
+```
+brew install git gh
+```
+
+Saknas Homebrew helt, installera det först:
+`NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`,
+läs sedan in det i din egen session med
+`eval "$([ -x /opt/homebrew/bin/brew ] && /opt/homebrew/bin/brew shellenv || /usr/local/bin/brew shellenv)"`.
+
+**Båda:** kör sedan `gh auth login --hostname github.com --git-protocol https --web`
+i bakgrunden, ge personen engångskoden och adressen som text och vänta tills
+hen loggat in. Personen behöver tillgång till organisationen
+`Wesports-Scandinavia-AB`.
 
 ## 3. Klona ws-dev-env
+
+**Windows:**
 
 ```
 gh repo clone Wesports-Scandinavia-AB/ws-dev-env "$HOME\source\repos\ws-dev-env"
 ```
 
-Vill personen ha repona någon annanstans, klona dit och ge `-Root` i nästa steg.
+**Mac:**
+
+```
+gh repo clone Wesports-Scandinavia-AB/ws-dev-env "$HOME/source/repos/ws-dev-env"
+```
+
+Vill personen ha repona någon annanstans, klona dit och ge `-Root`/`--root` i
+nästa steg.
 
 ## 4. Kör bootstrap
 
 Visa först vad som kommer att hända:
 
+**Windows:**
+
 ```
 powershell -ExecutionPolicy Bypass -File "$HOME\source\repos\ws-dev-env\bootstrap.ps1" -DryRun
 ```
 
+**Mac:**
+
+```
+bash "$HOME/source/repos/ws-dev-env/bootstrap.sh" --dry-run
+```
+
 Har personen ett eget lager (ett privat repo med samma upplägg: `packages.json`,
 `repos.txt`, `claude/CLAUDE.md`, `claude/skills/`), lägg till
-`-Personal owner/repo`. Kör sedan utan `-DryRun`.
+`-Personal owner/repo` (Windows) eller `--personal owner/repo` (Mac). Kör
+sedan utan `-DryRun`/`--dry-run`.
 
 Scriptet installerar programmen, klonar repona, läser in de gemensamma
 Claude-reglerna i `~/.claude/CLAUDE.md`, länkar skills, installerar `wsg` och
 gör en SSH-nyckel för datorn om det saknas. Det skriver aldrig över något som
-redan finns och går att köra igen.
+redan finns och går att köra igen. På Mac installeras Homebrew och `jq` som
+en del av steget om de saknas; det är `bootstrap.sh` självt som behöver dem,
+inte listan i `packages.json`.
 
 Saknar git namn eller e-post varnar scriptet. Fråga personen och sätt dem.
 
@@ -77,10 +116,10 @@ Saknar git namn eller e-post varnar scriptet. Fråga personen och sätt dem.
 
 Varje dator loggar in för sig, inget kopieras:
 
-- **wsg**: `python -m wsg graph login` i bakgrunden, ge personen adressen.
-  Scriptet la `wsg` i PATH, men ditt eget fönster startade innan dess, så
-  `python -m wsg` är formen som fungerar direkt. I personens nya terminal
-  heter det bara `wsg`.
+- **wsg**: `python -m wsg graph login` (Windows) eller `python3 -m wsg graph login`
+  (Mac) i bakgrunden, ge personen adressen. Scriptet la `wsg` i PATH, men ditt
+  eget fönster startade innan dess, så den fulla formen är det som fungerar
+  direkt. I personens nya terminal heter det bara `wsg`.
 - **SSH**: scriptet skrev ut den publika nyckeln. Den läggs in på servrarna,
   helst från den gamla datorn (se skillen `ws-dev-env`).
 - **Cloudflare**, när det behövs: `npx wrangler login` i det repo som använder det.
@@ -100,6 +139,11 @@ Här installeras ingenting. Målet är att inget går förlorat när datorn läm
    ```
    powershell -ExecutionPolicy Bypass -File "$HOME\source\repos\ws-dev-env\check.ps1"
    ```
+
+   Det här finns bara för Windows (`check.ps1`). Är den gamla datorn en Mac,
+   gå igenom samma sak för hand: `git status` och `git log --branches --not --remotes`
+   i varje repo under `~/source/repos`, leta efter `.env`/`.pem`/`.key`-filer
+   som git ignorerar, och notera SSH-nyckeln i `~/.ssh`.
 
 2. Gå igenom det **gula** med personen, en sak i taget, och förklara vad det är:
    - **Inte committat / inte pushat**: visa vad som ändrats och fråga om det ska

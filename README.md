@@ -4,22 +4,34 @@ En WeSports-utvecklardator, beskriven i ett repo: vilka program, vilka repon,
 vilka gemensamma regler och skills Claude ska ha. En ny dator blir en klon och
 ett script, och det någon lägger till får alla med `git pull`.
 
+Windows och Mac har varsitt entrypoint (`bootstrap.ps1` respektive
+`bootstrap.sh`), men samma lista: `packages.json`, `repos.txt` och `claude/`
+är gemensamma för båda, så resultatet är detsamma oavsett dator. Linux har
+inget entrypoint ännu.
+
 ## Kom igång
 
-Öppna PowerShell, klistra in en rad och tryck Enter. Raden installerar git,
-GitHub CLI, Claude Code och Herdr, och startar sedan Claude med uppdraget.
-Claude gör resten; du loggar bara in i webbläsaren när den ber om det.
+Öppna en terminal, klistra in raden för din dator och tryck Enter. Raden
+installerar det som behövs för att komma igång (git, GitHub CLI, Claude Code,
+Herdr) och startar sedan Claude med uppdraget. Claude gör resten; du loggar
+bara in i webbläsaren när den ber om det.
 
-**Ny dator:**
+**Ny Windows-dator (PowerShell):**
 
 ```powershell
 'Git.Git','GitHub.cli','Anthropic.ClaudeCode','Herdr.Herdr.Preview' | % { winget install -e --id $_ --accept-source-agreements --accept-package-agreements }; $env:Path=[Environment]::GetEnvironmentVariable('Path','Machine')+';'+[Environment]::GetEnvironmentVariable('Path','User'); claude "Det här är min NYA dator. Logga in mig på GitHub, klona Wesports-Scandinavia-AB/ws-dev-env till ~/source/repos/ws-dev-env och följ INSTALL-FOR-CLAUDE.md i repot. Jag är inte utvecklare: kör allt själv och be mig aldrig klistra in kommandon."
 ```
 
-**Gamla datorn**, innan du lämnar den:
+**Gamla Windows-datorn**, innan du lämnar den:
 
 ```powershell
 'Git.Git','GitHub.cli','Anthropic.ClaudeCode','Herdr.Herdr.Preview' | % { winget install -e --id $_ --accept-source-agreements --accept-package-agreements }; $env:Path=[Environment]::GetEnvironmentVariable('Path','Machine')+';'+[Environment]::GetEnvironmentVariable('Path','User'); claude "Jag ska byta dator och det här är den GAMLA. Logga in mig på GitHub, klona Wesports-Scandinavia-AB/ws-dev-env till ~/source/repos/ws-dev-env och följ avsnittet Den gamla datorn i INSTALL-FOR-CLAUDE.md. Jag är inte utvecklare: kör allt själv och fråga innan du ändrar något."
+```
+
+**Ny Mac (Terminal):**
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; eval "$([ -x /opt/homebrew/bin/brew ] && /opt/homebrew/bin/brew shellenv || /usr/local/bin/brew shellenv)"; brew install git gh herdr; brew install --cask claude-code; claude "Det här är min NYA Mac. Logga in mig på GitHub, klona Wesports-Scandinavia-AB/ws-dev-env till ~/source/repos/ws-dev-env och följ INSTALL-FOR-CLAUDE.md i repot. Jag är inte utvecklare: kör allt själv och be mig aldrig klistra in kommandon."
 ```
 
 Första gången Claude startar loggar du in på ditt Claude-konto.
@@ -27,14 +39,20 @@ Första gången Claude startar loggar du in på ditt Claude-konto.
 ## Innehåll
 
 ```
-bootstrap.ps1   ny dator, eller uppdatera en befintlig; går att köra om
-check.ps1       innan en dator lämnas: listar det som bara finns på den
-packages.json   program, i winget-format (winget export / import)
+bootstrap.ps1   Windows: ny dator, eller uppdatera en befintlig; går att köra om
+bootstrap.sh    Mac: samma sak, via Homebrew i stället för winget
+check.ps1       Windows, innan en dator lämnas: listar det som bara finns på den
+packages.json   program, delat mellan Windows och Mac: ett namn, ett winget-id, ett brew-id
 repos.txt       repon alla klonar
 claude/
   CLAUDE.md     gemensamma regler, läses in i allas ~/.claude/CLAUDE.md
   skills/       skills alla får, länkade in i ~/.claude/skills
 ```
+
+Ett paket i `packages.json` som saknar `brew` hoppas över på Mac
+(`windows-terminal`, finns bara på Windows). Ett paket utan `winget` hade på
+samma sätt hoppats över på Windows, men inget sådant finns ännu. `check.sh`
+för Mac finns inte: `check.ps1` är ännu bara Windows.
 
 ## Två lager
 

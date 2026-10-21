@@ -68,11 +68,18 @@ function Layers {
 }
 
 # --- 1. Programs -------------------------------------------------------------
+# packages.json is shared with bootstrap.sh (Mac): one list, one winget id and
+# one brew id per package. A package without a winget id (none here yet) is
+# skipped on Windows the same way a Mac-only one is skipped on Windows.
 function Install-Packages($layer) {
     $file = Join-Path $layer 'packages.json'
     if (-not (Test-Path $file)) { return }
-    Act "winget import $file" {
-        winget import -i $file --ignore-unavailable --accept-package-agreements --accept-source-agreements
+    $manifest = Get-Content $file -Raw | ConvertFrom-Json
+    foreach ($pkg in $manifest.packages) {
+        if (-not $pkg.winget) { continue }
+        Act "winget install $($pkg.name)" {
+            winget install --id $pkg.winget -e --accept-package-agreements --accept-source-agreements
+        }
     }
     Refresh-Path
 }
