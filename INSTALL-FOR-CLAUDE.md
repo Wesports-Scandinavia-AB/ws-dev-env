@@ -120,15 +120,19 @@ Varje dator loggar in för sig, inget kopieras:
   (Mac) i bakgrunden, ge personen adressen. Scriptet la `wsg` i PATH, men ditt
   eget fönster startade innan dess, så den fulla formen är det som fungerar
   direkt. I personens nya terminal heter det bara `wsg`.
-- **SSH**: scriptet skrev ut den publika nyckeln. Den läggs in på servrarna,
-  helst från den gamla datorn (se skillen `ws-dev-env`).
+- **SSH**: scriptet skrev ut den publika nyckeln. Den behövs bara för att
+  deploya `wesports-data`. Frågar personen inte själv efter det, säg att
+  nyckeln finns och lämna det därvid. Ska personen kunna deploya `wesports-data`,
+  läggs nyckeln in på den servern, helst från den gamla datorn (se skillen
+  `ws-dev-env`).
 - **Cloudflare**, när det behövs: `npx wrangler login` i det repo som använder det.
 
 ## 6. Klart
 
 Kör `pnpm install` i de repon som har `package.json`. Berätta sedan vad som
-installerats, vad som återstår (inloggningar, SSH-nyckeln på servrarna) och att
-"uppdatera dev-miljön" räcker för att hämta det andra lagt till.
+installerats, vad som återstår (inloggningar, och SSH-nyckeln på servern om
+personen ska deploya `wesports-data`) och att "uppdatera dev-miljön" räcker
+för att hämta det andra lagt till.
 
 ## Den gamla datorn
 
