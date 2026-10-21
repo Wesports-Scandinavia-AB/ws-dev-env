@@ -4,7 +4,7 @@
 # bootstrap.ps1; both read the same packages.json, repos.txt and claude/.
 #
 #   bash bootstrap.sh
-#   bash bootstrap.sh --personal erikbulowwesports/dev-env
+#   bash bootstrap.sh --personal yourname/dev-env
 #   bash bootstrap.sh --dry-run
 #
 # --root and --personal are remembered in ~/.ws-dev-env.json, so a re-run needs

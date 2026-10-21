@@ -3,7 +3,7 @@ Sets up a computer for WeSports development, or brings one up to date.
 Safe to run again: what already exists is left alone.
 
   powershell -ExecutionPolicy Bypass -File bootstrap.ps1
-  powershell -ExecutionPolicy Bypass -File bootstrap.ps1 -Personal erikbulowwesports/dev-env
+  powershell -ExecutionPolicy Bypass -File bootstrap.ps1 -Personal yourname/dev-env
   powershell -ExecutionPolicy Bypass -File bootstrap.ps1 -DryRun
 
 -Root and -Personal are remembered in ~/.ws-dev-env.json, so a re-run needs
