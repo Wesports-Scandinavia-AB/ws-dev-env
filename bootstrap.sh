@@ -79,7 +79,8 @@ layers() {
 
 # --- 1. Programs -------------------------------------------------------------
 install_packages() {
-    local layer="$1" file="$layer/packages.json"
+    local layer="$1"
+    local file="$layer/packages.json"
     [ -f "$file" ] || return 0
     while IFS=$'\t' read -r name id cask; do
         if [ "$cask" = "true" ]; then
@@ -106,7 +107,8 @@ act 'gh auth setup-git' gh auth setup-git
 
 # --- 3. Repos ------------------------------------------------------------------
 clone() {
-    local repo="$1" path="$ROOT/${repo##*/}"
+    local repo="$1"
+    local path="$ROOT/${repo##*/}"
     if [ -d "$path" ]; then echo "   exists: $repo"; return; fi
     act "clone $repo" gh repo clone "$repo" "$path"
 }
@@ -131,7 +133,7 @@ act "mkdir $SKILLS_DIR" mkdir -p "$SKILLS_DIR"
 # Each layer's CLAUDE.md is imported into the personal ~/.claude/CLAUDE.md, so
 # nobody's own instructions are overwritten and a git pull updates everyone.
 MEMORY="$CLAUDE_DIR/CLAUDE.md"
-touch "$MEMORY"
+[ "$DRY_RUN" -eq 1 ] || touch "$MEMORY"
 while read -r layer; do
     file="$layer/claude/CLAUDE.md"
     [ -f "$file" ] || continue
