@@ -8,6 +8,13 @@ it does not imply that a release or tag has been published.
 
 ### Added
 
+- Configure global Git ignores for local environment secret files on Windows
+  and Mac, plus `.hidden`, while preserving existing excludes-file contents.
+- Add the `make-change` skill to guide people without programming experience
+  through clarifying, implementing and trying a change, then opening a PR and
+  working through review and CI feedback until it is ready to merge. Ask
+  focused questions only when needed; merging requires its own authorization.
+- Ignore local environment secret files and document safe project-level setup.
 - Install Codex CLI alongside Claude Code on Windows and Mac.
 - Distribute shared `AGENTS.WeSports.md` instructions to both coding agents
   while preserving personal instructions and backing up changed files.

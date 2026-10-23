@@ -111,6 +111,29 @@ gh auth status >/dev/null 2>&1 || \
     act 'gh auth login (a browser window opens)' gh auth login --hostname github.com --git-protocol https --web
 act 'gh auth setup-git' gh auth setup-git
 
+# Protect local project secrets in every repository. Preserve any configured
+# excludes file and append a clearly marked, idempotent block to it.
+exclude_file="$(git config --global --path --get core.excludesFile 2>/dev/null || true)"
+if [ -z "$exclude_file" ]; then
+    exclude_file="$HOME/.ws-dev-env-gitignore"
+    act "git config --global core.excludesFile $exclude_file" \
+        git config --global core.excludesFile "$exclude_file"
+fi
+ignore_start='# ws-dev-env local secret files'
+ignore_end='# end ws-dev-env local secret files'
+if ! grep -Fqx "$ignore_start" "$exclude_file" 2>/dev/null; then
+    write_secret_ignores() {
+        mkdir -p "$(dirname "$exclude_file")"
+        {
+            printf '\n%s\n' "$ignore_start"
+            printf '%s\n' '.hidden' '.env' '.env.*' '!.env.example'
+            printf '%s\n' '.dev.vars' '.dev.vars.*' '!.dev.vars.example'
+            printf '%s\n' "$ignore_end"
+        } >> "$exclude_file"
+    }
+    act "add local secret ignores to $exclude_file" write_secret_ignores
+fi
+
 # --- 3. Repos ------------------------------------------------------------------
 clone() {
     local repo="$1"

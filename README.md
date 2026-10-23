@@ -5,6 +5,13 @@
 
 ### Added
 
+- Configure global Git ignores for local environment secret files on Windows
+  and Mac, plus `.hidden`, while preserving existing excludes-file contents.
+- Add the `make-change` skill to guide people without programming experience
+  through clarifying, implementing and trying a change, then opening a PR and
+  working through review and CI feedback until it is ready to merge. Ask
+  focused questions only when needed; merging requires its own authorization.
+- Ignore local environment secret files and document safe project-level setup.
 - Install Codex CLI alongside Claude Code on Windows and Mac.
 - Distribute shared `AGENTS.WeSports.md` instructions to both coding agents
   while preserving personal instructions and backing up changed files.
@@ -159,6 +166,15 @@ and [Claude imports](https://code.claude.com/docs/en/memory).
 
 ## Shared skills for local coding agents
 
+Use `make-change` when you want help changing an app or tool without needing
+to know how it is built. Ask the agent to use the skill and describe what you
+want to do. It inspects the project, asks focused questions when needed,
+implements the change and explains how to try it. It then pushes a feature
+branch, opens a PR, starts review and addresses review and CI feedback until
+the PR is ready to merge or needs external input. Merging is a separate
+authorized action. Clear, small requests do not require an interview. The
+skill works in both Claude Code and Codex.
+
 Bootstrap installs every bundle under `claude/skills/` in both the shared and
 personal environment layers for every package with a `skill_dir` entry.
 The source directory retains its old name for compatibility; it is shared
@@ -224,8 +240,16 @@ arguments.
 
 ## What never goes here
 
-Secrets, tokens, `.env` files and SSH keys. Every computer logs in on its own
-and gets its own SSH key. Passwords and keys are shared with `wsg secret`.
+Secrets, tokens, real `.env`/`.dev.vars` files and SSH private keys. In project
+repositories, keep required variable names and setup steps in documentation
+and placeholder values in `.env.example` or `.dev.vars.example`. Ignore the
+real local files in that project's `.gitignore`; this repository's `.gitignore`
+shows the pattern. Bootstrap also adds these patterns to Git's global excludes
+file so they are ignored across repositories; `.hidden` is globally ignored as
+well. If `core.excludesFile` is already configured, bootstrap appends a marked
+block without replacing its contents; otherwise it configures
+`~/.ws-dev-env-gitignore`. Each computer logs in on its own and gets its own SSH
+key. Transfer secrets between computers with `wsg secret` when needed.
 
 `~/.claude/settings.json` is also personal: that's where the permissions for
 this particular computer live.

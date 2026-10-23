@@ -28,9 +28,12 @@ installed copy. Read the current project's instructions for its conventions.
   prototypes and tests, and clearly identify demonstration data in previews.
 - Never place secrets in git, frontend code, logs, screenshots or chat.
   Keep real `.env` and `.dev.vars` files out of git; example files must contain
-  placeholders only. Use browser sign-in or the project's secret store.
-  For necessary secret transfers, use `wsg secret` when available; never
-  fall back to ordinary email, Teams or OneDrive.
+  placeholders only. When a project uses these files, check that its
+  `.gitignore` excludes `.env`, `.env.*`, `.dev.vars` and `.dev.vars.*`, while
+  allowing `.env.example` and `.dev.vars.example`. Document required variable
+  names and setup steps without recording values. Use browser sign-in or the
+  project's secret store. For necessary secret transfers, use `wsg secret`
+  when available; never fall back to ordinary email, Teams or OneDrive.
 - Reuse established authentication and validate permissions on the server.
   Hiding a button is not access control. Do not make private data public to
   get a feature working. Send business data only to services authorized for it.

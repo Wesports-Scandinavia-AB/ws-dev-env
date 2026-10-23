@@ -109,6 +109,31 @@ gh auth status *> $null
 if ($LASTEXITCODE -ne 0) { Act 'gh auth login (a browser window opens)' { gh auth login --hostname github.com --git-protocol https --web } }
 Act 'gh auth setup-git' { gh auth setup-git }
 
+# Protect local project secrets in every repository. Preserve any configured
+# excludes file and append a clearly marked, idempotent block to it.
+$excludeFile = git config --global --path --get core.excludesFile 2>$null
+if ($LASTEXITCODE -ne 0 -or -not $excludeFile) {
+    $excludeFile = Join-Path $HOME '.ws-dev-env-gitignore'
+    Act "git config --global core.excludesFile $excludeFile" {
+        git config --global core.excludesFile $excludeFile
+    }
+}
+$ignoreStart = '# ws-dev-env local secret files'
+$ignoreEnd = '# end ws-dev-env local secret files'
+$ignoreContent = if (Test-Path $excludeFile) { Get-Content $excludeFile -Raw } else { '' }
+if ($ignoreContent -notmatch [regex]::Escape($ignoreStart)) {
+    Act "add local secret ignores to $excludeFile" {
+        $parent = Split-Path -Parent $excludeFile
+        if ($parent) { New-Item -ItemType Directory -Force $parent | Out-Null }
+        $block = @(
+            $ignoreStart, '.hidden', '.env', '.env.*', '!.env.example',
+            '.dev.vars', '.dev.vars.*', '!.dev.vars.example', $ignoreEnd, ''
+        ) -join "`n"
+        $prefix = if ($ignoreContent -and -not $ignoreContent.EndsWith("`n")) { "`n" } else { '' }
+        [System.IO.File]::AppendAllText($excludeFile, $prefix + $block, [System.Text.UTF8Encoding]::new($false))
+    }
+}
+
 # --- 3. Repos ----------------------------------------------------------------
 function Clone($repo) {
     $path = Join-Path $config.root ($repo.Split('/')[1])
