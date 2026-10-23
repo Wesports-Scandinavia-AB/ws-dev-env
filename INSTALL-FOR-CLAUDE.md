@@ -104,8 +104,9 @@ If the person has a personal layer (a private repository with the same layout:
 without `-DryRun`/`--dry-run`.
 
 The script installs programs, clones repositories, distributes shared
-instructions through `AGENTS.WeSports.md` for Claude and Codex, links Claude
-skills, installs `wsg`, and creates an SSH key for the computer if missing.
+instructions through `AGENTS.WeSports.md` for Claude and Codex, links shared
+and personal skills for both coding agents, installs `wsg` and its skill for
+both agents, and creates an SSH key for the computer if missing.
 Personal instructions are preserved; the shared instruction copy is refreshed.
 The script can be run again. On Mac, Homebrew and `jq` are installed as part
 of this step if missing; `bootstrap.sh` itself needs them, rather than the
@@ -122,7 +123,8 @@ Each computer signs in separately; nothing is copied:
   Codex, start `codex` and let them sign in with their own account. This is
   the terminal tool, not the desktop app. Bootstrap copies AGENTS.WeSports.md
   to both tools' configuration directories and adds a reference in their
-  global instruction files. Skills are still installed for Claude only.
+  global instruction files. Both local coding agents receive the shared and
+  personal skill bundles, including the `wsg` skill.
 - **wsg**: run `python -m wsg graph login` (Windows) or `python3 -m wsg graph login`
   (Mac) in the background and give the person the URL. The script added `wsg`
   to PATH, but your session started before that, so the full form works

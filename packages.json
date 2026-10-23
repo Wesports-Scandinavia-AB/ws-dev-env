@@ -6,9 +6,10 @@
     { "name": "python", "winget": "Python.Python.3.12", "brew": "python@3.12" },
     { "name": "vscode", "winget": "Microsoft.VisualStudioCode", "brew": "visual-studio-code", "cask": true },
     { "name": "windows-terminal", "winget": "Microsoft.WindowsTerminal" },
-    { "name": "claude-code", "winget": "Anthropic.ClaudeCode", "brew": "claude-code", "cask": true },
-    { "name": "codex", "npm": "@openai/codex" },
+    { "name": "claude-code", "winget": "Anthropic.ClaudeCode", "brew": "claude-code", "cask": true, "skill_dir": ".claude/skills", "skill_config_env": "CLAUDE_CONFIG_DIR" },
+    { "name": "codex", "npm": "@openai/codex", "skill_dir": ".agents/skills" },
     { "name": "claude-desktop", "winget": "Anthropic.Claude", "brew": "claude", "cask": true },
-    { "name": "herdr", "winget": "Herdr.Herdr.Preview", "brew": "herdr" }
+    { "name": "herdr", "winget": "Herdr.Herdr.Preview", "brew": "herdr" },
+    { "name": "ghostty", "brew": "ghostty", "cask": true }
   ]
 }

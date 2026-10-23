@@ -130,14 +130,12 @@ while read -r layer; do
     fi
 done < <(layers)
 
-# --- 4. Shared instructions and Claude skills ---------------------------------
+# --- 4. Shared instructions and agent skills ----------------------------------
 step 'Claude and Codex instructions'
 SYNC_ARGS=()
 [ "$DRY_RUN" -eq 0 ] || SYNC_ARGS+=(--dry-run)
 python3 "$HERE/sync-instructions.py" "${SYNC_ARGS[@]}" || exit 1
 CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-SKILLS_DIR="$CLAUDE_DIR/skills"
-act "mkdir $SKILLS_DIR" mkdir -p "$SKILLS_DIR"
 
 # Personal layers keep their existing Claude-specific imports.
 MEMORY="$CLAUDE_DIR/CLAUDE.md"
@@ -149,19 +147,6 @@ while read -r layer; do
     line="@$(import_path "$file")"
     if grep -qF "$line" "$MEMORY" 2>/dev/null; then echo "   imported: $line"; continue; fi
     act "add $line to $MEMORY" append_line "$MEMORY" "$line"
-done < <(layers)
-
-# Skills are linked as symlinks. A skill that is already there is left alone.
-while read -r layer; do
-    dir="$layer/claude/skills"
-    [ -d "$dir" ] || continue
-    for s in "$dir"/*/; do
-        [ -d "$s" ] || continue
-        name="$(basename "$s")"
-        target="$SKILLS_DIR/$name"
-        if [ -e "$target" ]; then echo "   exists: skills/$name"; continue; fi
-        act "link skills/$name" ln -s "${s%/}" "$target"
-    done
 done < <(layers)
 
 # wsg: Microsoft 365, Teams, Arena and one-time secret links, with its own skill.
@@ -183,8 +168,16 @@ else
             act "add $USER_BIN to PATH" append_line "$BREW_PROFILE" "export PATH=\"$USER_BIN:\$PATH\""
         export PATH="$USER_BIN:$PATH"
     fi
-    [ -d "$SKILLS_DIR/wsg" ] || act 'wsg skill install' python3 -m wsg skill install
 fi
+
+# One shared installer handles all coding agents declared in packages.json.
+step 'Agent skills'
+SKILL_ARGS=(--with-wsg)
+while IFS= read -r layer; do
+    [ "$layer" = "$HERE" ] || SKILL_ARGS+=(--layer "$layer")
+done < <(layers)
+[ "$DRY_RUN" -eq 0 ] || SKILL_ARGS+=(--dry-run)
+python3 "$HERE/sync-skills.py" "${SKILL_ARGS[@]}" || exit 1
 
 # --- 5. SSH key for this computer ----------------------------------------------
 step 'SSH key'

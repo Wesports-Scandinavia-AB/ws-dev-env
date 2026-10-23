@@ -7,7 +7,7 @@ description: Set up or update a WeSports development computer with ws-dev-env, a
 
 The `Wesports-Scandinavia-AB/ws-dev-env` repository describes a WeSports
 development computer: programs (`packages.json`), repositories (`repos.txt`),
-shared Claude and Codex instructions (`AGENTS.WeSports.md`) and Claude skills
+shared Claude and Codex instructions (`AGENTS.WeSports.md`) and shared skills
 (`claude/skills/`). It is cloned under the root in `~/.ws-dev-env.json`,
 usually `~/source/repos/ws-dev-env`.
 
@@ -45,6 +45,12 @@ On Mac, run `bootstrap.sh` (`--dry-run`). To update instructions only, run
 `git pull` and `python sync-instructions.py` in the repository (`python3` on Mac).
 Synchronization copies AGENTS.WeSports.md to both tools and preserves personal
 instructions. Ask the user to start a new agent session afterwards.
+
+To synchronize skills only, run `python sync-skills.py --with-wsg` (`python3`
+on Mac). Every shared and personal skill is installed for each coding agent
+declared with `skill_dir` in `packages.json`. The `wsg` skill is refreshed
+from the installed package. Resolve any reported name conflict rather than
+overwriting a person's existing skill.
 
 ## Sharing with everyone
 

@@ -1,0 +1,39 @@
+name: Repository checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check version notes
+        run: python scripts/update-readme.py --check
+      - name: Require changelog updates
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -z "$BASE_SHA" ] || [[ "$BASE_SHA" =~ ^0+$ ]]; then
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA" HEAD)
+          if [ -n "$changed" ] && ! grep -qx 'CHANGELOG.md' <<< "$changed"; then
+            echo 'Update CHANGELOG.md with the user-visible effect of this change, then regenerate README.md.'
+            exit 1
+          fi
+      - name: Run tests
+        run: python -B -m unittest discover -s tests -v
+      - name: Check shell syntax
+        run: |
+          bash -n bootstrap.sh
+          bash -n lib.sh

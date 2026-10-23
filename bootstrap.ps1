@@ -127,7 +127,7 @@ foreach ($layer in Layers) {
     }
 }
 
-# --- 4. Shared instructions and Claude skills --------------------------------
+# --- 4. Shared instructions and agent skills ---------------------------------
 Step 'Claude and Codex instructions'
 if (-not (Has 'python')) { throw 'Python is required to synchronize the shared instructions.' }
 $syncArgs = @((Join-Path $here 'sync-instructions.py'))
@@ -135,8 +135,6 @@ if ($DryRun) { $syncArgs += '--dry-run' }
 python @syncArgs
 if ($LASTEXITCODE -ne 0) { throw 'Instruction synchronization failed.' }
 $claude = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
-$skills = Join-Path $claude 'skills'
-Act "mkdir $skills" { New-Item -ItemType Directory -Force $skills | Out-Null }
 
 # Personal layers keep their existing Claude-specific imports.
 $memory = Join-Path $claude 'CLAUDE.md'
@@ -148,18 +146,6 @@ foreach ($layer in Layers) {
     $line = '@' + (Get-ImportPath $file)
     if ($current -and $current.Contains($line)) { Write-Host "   imported: $line"; continue }
     Act "add $line to $memory" { Add-Content -Path $memory -Value "`n$line" -Encoding UTF8 }
-}
-
-# Skills are linked as directory junctions, which need neither admin nor
-# Developer Mode. A skill that is already there is left alone.
-foreach ($layer in Layers) {
-    $dir = Join-Path $layer 'claude\skills'
-    if (-not (Test-Path $dir)) { continue }
-    foreach ($s in Get-ChildItem $dir -Directory) {
-        $target = Join-Path $skills $s.Name
-        if (Test-Path $target) { Write-Host "   exists: skills\$($s.Name)"; continue }
-        Act "link skills\$($s.Name)" { New-Item -ItemType Junction -Path $target -Target $s.FullName | Out-Null }
-    }
 }
 
 # wsg: Microsoft 365, Teams, Arena and one-time secret links, with its own skill.
@@ -178,8 +164,17 @@ if (-not (Has 'python')) {
     if (-not (Has 'wsg')) {
         Add-UserPath (python -c "import sysconfig; print(sysconfig.get_path('scripts', 'nt_user'))")
     }
-    if (-not (Test-Path (Join-Path $skills 'wsg'))) { Act 'wsg skill install' { python -m wsg skill install } }
 }
+
+# One shared installer handles all coding agents declared in packages.json.
+Step 'Agent skills'
+$skillArgs = @((Join-Path $here 'sync-skills.py'), '--with-wsg')
+foreach ($layer in Layers) {
+    if ($layer -ne $here) { $skillArgs += @('--layer', $layer) }
+}
+if ($DryRun) { $skillArgs += '--dry-run' }
+python @skillArgs
+if ($LASTEXITCODE -ne 0) { throw 'Skill synchronization failed.' }
 
 # --- 5. SSH key for this computer --------------------------------------------
 Step 'SSH key'
