@@ -7,6 +7,7 @@
     { "name": "vscode", "winget": "Microsoft.VisualStudioCode", "brew": "visual-studio-code", "cask": true },
     { "name": "windows-terminal", "winget": "Microsoft.WindowsTerminal" },
     { "name": "claude-code", "winget": "Anthropic.ClaudeCode", "brew": "claude-code", "cask": true },
+    { "name": "codex", "npm": "@openai/codex" },
     { "name": "claude-desktop", "winget": "Anthropic.Claude", "brew": "claude", "cask": true },
     { "name": "herdr", "winget": "Herdr.Herdr.Preview", "brew": "herdr" }
   ]

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Sets up a Mac for WeSports development, or brings one up to date.
-# Safe to run again: what already exists is left alone. The Windows version is
+# Safe to re-run: personal files are preserved; shared rules are refreshed.
+# The Windows version is
 # bootstrap.ps1; both read the same packages.json, repos.txt and claude/.
 #
 #   bash bootstrap.sh
@@ -89,10 +90,15 @@ install_packages() {
             act "brew install $name" brew install "$id"
         fi
     done < <(jq -r '.packages[] | select(.brew) | [.name, .brew, (.cask // false)] | @tsv' "$file")
+    # Node is installed above. npm packages use their name as the command check.
+    while IFS=$'\t' read -r name package; do
+        if has "$name"; then echo "   exists: $name"; continue; fi
+        act "npm install -g $package" npm install -g "$package" || return 1
+    done < <(jq -r '.packages[] | select(.npm) | [.name, .npm] | @tsv' "$file")
 }
 
 step 'Programs'
-install_packages "$HERE"
+install_packages "$HERE" || exit 1
 has pnpm || act 'npm install -g pnpm@9' npm install -g pnpm@9
 
 # --- 2. Git and GitHub --------------------------------------------------------
@@ -117,24 +123,27 @@ step "Repos in $ROOT"
 act "mkdir $ROOT" mkdir -p "$ROOT"
 [ -n "$PERSONAL" ] && clone "$PERSONAL"
 while read -r layer; do
-    [ "$layer" = "$HERE" ] || install_packages "$layer"
+    [ "$layer" = "$HERE" ] || install_packages "$layer" || exit 1
     list="$layer/repos.txt"
     if [ -f "$list" ]; then
         while read -r repo; do clone "$repo"; done < <(grep -E '^\s*[^#[:space:]]' "$list")
     fi
 done < <(layers)
 
-# --- 4. Claude -----------------------------------------------------------------
-step 'Claude Code'
-CLAUDE_DIR="$HOME/.claude"
+# --- 4. Shared instructions and Claude skills ---------------------------------
+step 'Claude and Codex instructions'
+SYNC_ARGS=()
+[ "$DRY_RUN" -eq 0 ] || SYNC_ARGS+=(--dry-run)
+python3 "$HERE/sync-instructions.py" "${SYNC_ARGS[@]}" || exit 1
+CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 SKILLS_DIR="$CLAUDE_DIR/skills"
 act "mkdir $SKILLS_DIR" mkdir -p "$SKILLS_DIR"
 
-# Each layer's CLAUDE.md is imported into the personal ~/.claude/CLAUDE.md, so
-# nobody's own instructions are overwritten and a git pull updates everyone.
+# Personal layers keep their existing Claude-specific imports.
 MEMORY="$CLAUDE_DIR/CLAUDE.md"
 [ "$DRY_RUN" -eq 1 ] || touch "$MEMORY"
 while read -r layer; do
+    [ "$layer" != "$HERE" ] || continue
     file="$layer/claude/CLAUDE.md"
     [ -f "$file" ] || continue
     line="@$(import_path "$file")"
@@ -198,7 +207,7 @@ fi
 [ "$DRY_RUN" -eq 1 ] || save_dev_env_config "$ROOT" "$PERSONAL"
 
 step 'Installed'
-for cmd in git gh node pnpm python3 wsg code claude herdr; do
+for cmd in git gh node pnpm python3 wsg code claude codex herdr; do
     if has "$cmd"; then echo "   OK       $cmd"; else echo "   MISSING  $cmd  (open a new terminal and run again)"; fi
 done
-printf '\nNext: open a new terminal, run '"'"'claude'"'"' and log in, then '"'"'wsg graph login'"'"'.\n'
+printf "\nNext: run 'claude' or 'codex' and log in to the corresponding account, then 'wsg graph login'.\n"

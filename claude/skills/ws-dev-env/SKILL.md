@@ -1,48 +1,54 @@
 ---
 name: ws-dev-env
-description: Sätt upp eller uppdatera en utvecklardator på WeSports med ws-dev-env, och kontrollera att inget går förlorat innan en dator lämnas. Use when the user says "ny dator", "byta dator", "flytta till nya datorn", "sätt upp min dator", "uppdatera dev-miljön", "kan jag tömma datorn", "kolla innan jag lämnar datorn", or wants a program, repo or Claude rule shared with the whole team.
+description: Set up or update a WeSports development computer with ws-dev-env, and check that nothing will be lost before leaving a computer. Use when the user asks about a new computer, switching computers, moving to a new computer, setting up their computer, updating the development environment, wiping a computer, checking before leaving a computer, or sharing a program, repository or agent rule with the whole team.
 ---
 
 # ws-dev-env
 
-Repot `Wesports-Scandinavia-AB/ws-dev-env` beskriver en WeSports-utvecklardator:
-program (`packages.json`), repon (`repos.txt`), gemensamma Claude-regler
-(`claude/CLAUDE.md`) och skills (`claude/skills/`). Det ligger klonat under
-roten i `~/.ws-dev-env.json`, normalt `~/source/repos/ws-dev-env`.
+The `Wesports-Scandinavia-AB/ws-dev-env` repository describes a WeSports
+development computer: programs (`packages.json`), repositories (`repos.txt`),
+shared Claude and Codex instructions (`AGENTS.WeSports.md`) and Claude skills
+(`claude/skills/`). It is cloned under the root in `~/.ws-dev-env.json`,
+usually `~/source/repos/ws-dev-env`.
 
-## Byta dator
+## Switching computers
 
-1. **På den gamla datorn**, kör kontrollen och gå igenom det den listar med
-   personen:
+1. **On the old computer**, run the check and review its findings with the user:
 
    ```
    powershell -ExecutionPolicy Bypass -File <root>\ws-dev-env\check.ps1
    ```
 
-   Gult är sådant som går förlorat: committa och pusha, eller flytta
-   hemligheter med `wsg secret`. Blått är påminnelser (minne, SSH-nycklar).
-   Säg inte att datorn kan tömmas förrän scriptet avslutas med "Nothing lost".
+   Yellow means something will be lost: commit and push, or transfer secrets
+   with `wsg secret`. Blue indicates reminders (memory, SSH keys).
+   Do not say the computer can be wiped until the script reports "Nothing lost".
 
-2. **På den nya datorn**, följ `INSTALL-FOR-CLAUDE.md` i repot.
+2. **On the new computer**, follow `INSTALL-FOR-CLAUDE.md` in the repository.
 
-3. **SSH**: flytta aldrig den privata nyckeln. `bootstrap.ps1` gör en ny och
-   skriver ut den publika delen. Den läggs in på servern från den gamla datorn,
-   som redan kommer in:
+3. **SSH**: never transfer the private key. `bootstrap.ps1` creates a new key
+   and prints its public part. Add it to the server from the old computer,
+   which already has access:
 
    ```
-   ssh <användare>@<server> "echo '<publik nyckel>' >> ~/.ssh/authorized_keys"
+   ssh <user>@<server> "echo '<public key>' >> ~/.ssh/authorized_keys"
    ```
 
-   När den nya fungerar tas den gamla datorns rad bort ur `authorized_keys`.
+   Once the new key works, remove the old computer's entry from `authorized_keys`.
 
-## Uppdatera
+## Updating
 
-`git pull` i ws-dev-env och sedan `bootstrap.ps1` igen. Det hoppar över allt som
-redan finns. `-DryRun` visar vad som skulle hända utan att ändra något.
+Run `git pull` in ws-dev-env, then run `bootstrap.ps1` again. Existing
+installations are skipped and shared instructions are refreshed. `-DryRun`
+shows what would happen without making changes.
 
-## Dela något med alla
+On Mac, run `bootstrap.sh` (`--dry-run`). To update instructions only, run
+`git pull` and `python sync-instructions.py` in the repository (`python3` on Mac).
+Synchronization copies AGENTS.WeSports.md to both tools and preserves personal
+instructions. Ask the user to start a new agent session afterwards.
 
-Ett program, ett repo, en regel eller en skill som hela teamet ska ha läggs i
-ws-dev-env, inte bara på den egna datorn. Det som är personligt hör hemma i
-personens eget lager (`-Personal owner/repo`, samma upplägg). Lägg aldrig in
-hemligheter, tokens eller personliga sökvägar i ws-dev-env.
+## Sharing with everyone
+
+Add programs, repositories, rules and skills the whole team needs to
+ws-dev-env, not just the local computer. Personal additions belong in the
+user's own layer (`-Personal owner/repo`, with the same layout). Never add
+secrets, tokens or personal paths to ws-dev-env.

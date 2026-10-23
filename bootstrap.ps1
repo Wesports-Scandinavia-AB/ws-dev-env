@@ -1,6 +1,6 @@
 <#
 Sets up a computer for WeSports development, or brings one up to date.
-Safe to run again: what already exists is left alone.
+Safe to run again: personal files are preserved; shared instructions are refreshed.
 
   powershell -ExecutionPolicy Bypass -File bootstrap.ps1
   powershell -ExecutionPolicy Bypass -File bootstrap.ps1 -Personal yourname/dev-env
@@ -69,8 +69,7 @@ function Layers {
 
 # --- 1. Programs -------------------------------------------------------------
 # packages.json is shared with bootstrap.sh (Mac): one list, one winget id and
-# one brew id per package. A package without a winget id (none here yet) is
-# skipped on Windows the same way a Mac-only one is skipped on Windows.
+# one brew id per native package. npm packages run after Node and PATH refresh.
 function Install-Packages($layer) {
     $file = Join-Path $layer 'packages.json'
     if (-not (Test-Path $file)) { return }
@@ -82,6 +81,16 @@ function Install-Packages($layer) {
         }
     }
     Refresh-Path
+    foreach ($pkg in $manifest.packages) {
+        if (-not $pkg.npm) { continue }
+        if (Has $pkg.name) { Write-Host "   exists: $($pkg.name)"; continue }
+        Act "npm install -g $($pkg.npm)" {
+            if (-not (Has 'npm.cmd')) { throw 'npm is missing; Node.js installation must succeed first.' }
+            npm.cmd install -g $pkg.npm
+            if ($LASTEXITCODE -ne 0) { throw "npm installation failed: $($pkg.npm)" }
+            Add-UserPath ((npm.cmd prefix -g) | Select-Object -Last 1)
+        }
+    }
 }
 
 Step 'Programs'
@@ -118,17 +127,22 @@ foreach ($layer in Layers) {
     }
 }
 
-# --- 4. Claude ---------------------------------------------------------------
-Step 'Claude Code'
-$claude = Join-Path $HOME '.claude'
+# --- 4. Shared instructions and Claude skills --------------------------------
+Step 'Claude and Codex instructions'
+if (-not (Has 'python')) { throw 'Python is required to synchronize the shared instructions.' }
+$syncArgs = @((Join-Path $here 'sync-instructions.py'))
+if ($DryRun) { $syncArgs += '--dry-run' }
+python @syncArgs
+if ($LASTEXITCODE -ne 0) { throw 'Instruction synchronization failed.' }
+$claude = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-Path $HOME '.claude' }
 $skills = Join-Path $claude 'skills'
 Act "mkdir $skills" { New-Item -ItemType Directory -Force $skills | Out-Null }
 
-# Each layer's CLAUDE.md is imported into the personal ~/.claude/CLAUDE.md, so
-# nobody's own instructions are overwritten and a git pull updates everyone.
+# Personal layers keep their existing Claude-specific imports.
 $memory = Join-Path $claude 'CLAUDE.md'
 $current = if (Test-Path $memory) { Get-Content $memory -Raw } else { '' }
 foreach ($layer in Layers) {
+    if ($layer -eq $here) { continue }
     $file = Join-Path $layer 'claude\CLAUDE.md'
     if (-not (Test-Path $file)) { continue }
     $line = '@' + (Get-ImportPath $file)
@@ -188,8 +202,8 @@ if (Test-Path "$key.pub") {
 if (-not $DryRun) { Save-DevEnvConfig $config }
 
 Step 'Installed'
-foreach ($cmd in 'git', 'gh', 'node', 'pnpm', 'python', 'wsg', 'code', 'claude', 'herdr') {
+foreach ($cmd in 'git', 'gh', 'node', 'pnpm', 'python', 'wsg', 'code', 'claude', 'codex', 'herdr') {
     if (Has $cmd) { Write-Host "   OK       $cmd" -ForegroundColor Green }
     else { Write-Host "   MISSING  $cmd  (open a new terminal and run again)" -ForegroundColor Yellow }
 }
-Write-Host "`nNext: open a new terminal, run 'claude' and log in, then 'wsg graph login'." -ForegroundColor Cyan
+Write-Host "`nNext: run 'claude' or 'codex' and log in to the corresponding account, then 'wsg graph login'." -ForegroundColor Cyan

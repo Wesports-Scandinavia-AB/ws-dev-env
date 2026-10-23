@@ -1,43 +1,43 @@
-# Instruktion till Claude: sätt upp en utvecklardator med ws-dev-env
+# Instructions for Claude: set up a development computer with ws-dev-env
 
-Den här filen är skriven till dig, Claude, inte till människan du hjälper. Någon
-har gett dig länken för att få sin dator uppsatt för utveckling på WeSports,
-eller för att flytta från en gammal dator.
+This file is written for you, Claude, rather than the person you are helping.
+Someone has shared this link to set up their computer for development at
+WeSports or to move from an old computer.
 
-Följ stegen i ordning och förklara kort vad som händer. Personen är inte
-nödvändigtvis utvecklare: förklara på vanlig svenska, och fråga innan du
-committar, pushar eller tar bort något.
+Follow the steps in order and briefly explain what is happening. The person
+may not be a developer: use plain language and ask before committing,
+pushing or deleting anything.
 
-**Kör varje kommando själv.** Be aldrig personen klistra in något i PowerShell
-eller en terminal, och be hen inte öppna en ny terminal. Hen ska bara läsa,
-logga in i webbläsaren och svara på frågor. Saknas ett program som nyss
-installerats, läs in PATH igen i ditt eget anrop:
+**Run every command yourself.** Never ask the person to paste anything into
+PowerShell or a terminal, or to open a new terminal. They should only need
+to read, sign in through their browser and answer questions. If a newly
+installed program is not found, refresh PATH in your own command session:
 
 ```
 $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
 ```
 
-## 0. Förutsättningar
+## 0. Prerequisites
 
-Du måste kunna köra kommandon på personens dator, till exempel i Claude Code.
-Kan du inte det, säg det och stanna.
+You must be able to run commands on the person's computer, for example through
+Claude Code. If you cannot, explain that and stop.
 
-**Be aldrig om lösenord, kod eller token i chatten.** Inloggningar sker i
-personens egen webbläsare.
+**Never ask for passwords, codes or tokens in chat.** Sign-in happens in the
+person's own browser.
 
-Upplägget gäller Windows och Mac. På Linux: säg det och stanna.
+This setup supports Windows and Mac. On Linux, explain that and stop.
 
-## 1. Vilken plattform, och gammal eller ny dator?
+## 1. Which platform, and is this the old or new computer?
 
-Kör `uname` (Mac/Linux svarar `Darwin`/`Linux`) eller titta efter `$env:OS` på
-Windows, om det inte redan är tydligt. Är det Linux: säg det och stanna.
+Run `uname` (Mac/Linux returns `Darwin`/`Linux`) or check `$env:OS` on Windows
+if the platform is not already clear. On Linux, explain that and stop.
 
-Fråga sedan om det här är datorn personen ska **lämna** eller den **nya**.
-Steg 2 och 3 gäller båda. Är det den gamla, gå till "Den gamla datorn" längst
-ner i stället för steg 4; på Mac finns där ännu bara Windows-kontrollen
-(`check.ps1`), se anmärkningen i det avsnittet.
+Then ask whether this is the computer the person is **leaving** or the **new**
+one. Steps 2 and 3 apply to both. For the old computer, skip step 4 and go to
+"The old computer" below. That section currently only has an automated
+Windows check (`check.ps1`); see its note about Mac.
 
-## 2. git och GitHub
+## 2. git and GitHub
 
 **Windows:**
 
@@ -46,8 +46,8 @@ winget install --id Git.Git -e --accept-package-agreements --accept-source-agree
 winget install --id GitHub.cli -e --accept-package-agreements --accept-source-agreements
 ```
 
-Startraden i README:n har oftast redan installerat dem; winget hoppar då över
-dem. Läs in PATH igen (se ovan).
+The initial command in the README usually already installed these; winget
+will skip them in that case. Refresh PATH again (see above).
 
 **Mac:**
 
@@ -55,17 +55,17 @@ dem. Läs in PATH igen (se ovan).
 brew install git gh
 ```
 
-Saknas Homebrew helt, installera det först:
+If Homebrew is missing, install it first:
 `NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`,
-läs sedan in det i din egen session med
+then load it into your own session with
 `eval "$([ -x /opt/homebrew/bin/brew ] && /opt/homebrew/bin/brew shellenv || /usr/local/bin/brew shellenv)"`.
 
-**Båda:** kör sedan `gh auth login --hostname github.com --git-protocol https --web`
-i bakgrunden, ge personen engångskoden och adressen som text och vänta tills
-hen loggat in. Personen behöver tillgång till organisationen
-`Wesports-Scandinavia-AB`.
+**Both:** run `gh auth login --hostname github.com --git-protocol https --web`
+in the background, give the person the one-time code and URL as text, and
+wait until they have signed in. They need access to the
+`Wesports-Scandinavia-AB` organization.
 
-## 3. Klona ws-dev-env
+## 3. Clone ws-dev-env
 
 **Windows:**
 
@@ -79,12 +79,12 @@ gh repo clone Wesports-Scandinavia-AB/ws-dev-env "$HOME\source\repos\ws-dev-env"
 gh repo clone Wesports-Scandinavia-AB/ws-dev-env "$HOME/source/repos/ws-dev-env"
 ```
 
-Vill personen ha repona någon annanstans, klona dit och ge `-Root`/`--root` i
-nästa steg.
+If the person wants repositories elsewhere, clone there and pass
+`-Root`/`--root` in the next step.
 
-## 4. Kör bootstrap
+## 4. Run bootstrap
 
-Visa först vad som kommer att hända:
+First show what will happen:
 
 **Windows:**
 
@@ -98,80 +98,90 @@ powershell -ExecutionPolicy Bypass -File "$HOME\source\repos\ws-dev-env\bootstra
 bash "$HOME/source/repos/ws-dev-env/bootstrap.sh" --dry-run
 ```
 
-Har personen ett eget lager (ett privat repo med samma upplägg: `packages.json`,
-`repos.txt`, `claude/CLAUDE.md`, `claude/skills/`), lägg till
-`-Personal owner/repo` (Windows) eller `--personal owner/repo` (Mac). Kör
-sedan utan `-DryRun`/`--dry-run`.
+If the person has a personal layer (a private repository with the same layout:
+`packages.json`, `repos.txt`, `claude/CLAUDE.md`, `claude/skills/`), add
+`-Personal owner/repo` (Windows) or `--personal owner/repo` (Mac). Then run
+without `-DryRun`/`--dry-run`.
 
-Scriptet installerar programmen, klonar repona, läser in de gemensamma
-Claude-reglerna i `~/.claude/CLAUDE.md`, länkar skills, installerar `wsg` och
-gör en SSH-nyckel för datorn om det saknas. Det skriver aldrig över något som
-redan finns och går att köra igen. På Mac installeras Homebrew och `jq` som
-en del av steget om de saknas; det är `bootstrap.sh` självt som behöver dem,
-inte listan i `packages.json`.
+The script installs programs, clones repositories, distributes shared
+instructions through `AGENTS.WeSports.md` for Claude and Codex, links Claude
+skills, installs `wsg`, and creates an SSH key for the computer if missing.
+Personal instructions are preserved; the shared instruction copy is refreshed.
+The script can be run again. On Mac, Homebrew and `jq` are installed as part
+of this step if missing; `bootstrap.sh` itself needs them, rather than the
+list in `packages.json`.
 
-Saknar git namn eller e-post varnar scriptet. Fråga personen och sätt dem.
+If git has no name or email configured, the script warns. Ask the person and
+set those values.
 
-## 5. Inloggningar
+## 5. Sign-ins
 
-Varje dator loggar in för sig, inget kopieras:
+Each computer signs in separately; nothing is copied:
 
-- **wsg**: `python -m wsg graph login` (Windows) eller `python3 -m wsg graph login`
-  (Mac) i bakgrunden, ge personen adressen. Scriptet la `wsg` i PATH, men ditt
-  eget fönster startade innan dess, så den fulla formen är det som fungerar
-  direkt. I personens nya terminal heter det bara `wsg`.
-- **SSH**: scriptet skrev ut den publika nyckeln. Den behövs bara för att
-  deploya `wesports-data`. Frågar personen inte själv efter det, säg att
-  nyckeln finns och lämna det därvid. Ska personen kunna deploya `wesports-data`,
-  läggs nyckeln in på den servern, helst från den gamla datorn (se skillen
-  `ws-dev-env`).
-- **Cloudflare**, när det behövs: `npx wrangler login` i det repo som använder det.
+- **Codex CLI** is also installed by bootstrap. When the person wants to use
+  Codex, start `codex` and let them sign in with their own account. This is
+  the terminal tool, not the desktop app. Bootstrap copies AGENTS.WeSports.md
+  to both tools' configuration directories and adds a reference in their
+  global instruction files. Skills are still installed for Claude only.
+- **wsg**: run `python -m wsg graph login` (Windows) or `python3 -m wsg graph login`
+  (Mac) in the background and give the person the URL. The script added `wsg`
+  to PATH, but your session started before that, so the full form works
+  immediately. In the person's new terminal, the command is simply `wsg`.
+- **SSH**: the script printed the public key. It is only needed to deploy
+  `wesports-data`. Unless the person asks about that, say the key is available
+  and leave it there. If they need to deploy `wesports-data`, add the key to
+  that server, preferably from the old computer (see the `ws-dev-env` skill).
+- **Cloudflare**, when needed: run `npx wrangler login` in the repository that
+  uses it.
 
-## 6. Klart
+## 6. Done
 
-Kör `pnpm install` i de repon som har `package.json`. Berätta sedan vad som
-installerats, vad som återstår (inloggningar, och SSH-nyckeln på servern om
-personen ska deploya `wesports-data`) och att "uppdatera dev-miljön" räcker
-för att hämta det andra lagt till.
+Run `pnpm install` in repositories containing `package.json`. Then explain
+what was installed, what remains (sign-ins, and the SSH key on the server if
+the person needs to deploy `wesports-data`), and that asking to "update the
+development environment" is enough to get additions made by others.
 
-## Den gamla datorn
+## The old computer
 
-Här installeras ingenting. Målet är att inget går förlorat när datorn lämnas.
+Do not install anything in this section. The goal is to avoid losing anything
+when the computer is handed over.
 
-1. Kör kontrollen. Ligger repona inte i `~/source/repos`, ge `-Root`:
+1. Run the check. If repositories are not under `~/source/repos`, pass `-Root`:
 
    ```
    powershell -ExecutionPolicy Bypass -File "$HOME\source\repos\ws-dev-env\check.ps1"
    ```
 
-   Det här finns bara för Windows (`check.ps1`). Är den gamla datorn en Mac,
-   gå igenom samma sak för hand: `git status` och `git log --branches --not --remotes`
-   i varje repo under `~/source/repos`, leta efter `.env`/`.pem`/`.key`-filer
-   som git ignorerar, och notera SSH-nyckeln i `~/.ssh`.
+   This automated check is Windows-only (`check.ps1`). If the old computer is
+   a Mac, perform the same checks manually: run `git status` and
+   `git log --branches --not --remotes` in each repository under `~/source/repos`,
+   look for `.env`/`.pem`/`.key` files ignored by git, and note the SSH key
+   in `~/.ssh`.
 
-2. Gå igenom det **gula** med personen, en sak i taget, och förklara vad det är:
-   - **Inte committat / inte pushat**: visa vad som ändrats och fråga om det ska
-     sparas. Ska det det, committa och pusha på en egen gren och berätta vilken.
-   - **Filer som ser ut som hemligheter** (`.env`, `.dev.vars`): de flyttas inte
-     via git, OneDrive eller mail. Skicka dem till personen själv med
-     `python -m wsg secret`, en engångslänk, och be hen öppna den på den nya
-     datorn. Saknas wsg, installera det enligt
+2. Review the **yellow** items with the person, one at a time, explaining each:
+   - **Not committed / not pushed**: show the changes and ask whether to save
+     them. If yes, commit and push on a separate branch and name the branch.
+   - **Files that look like secrets** (`.env`, `.dev.vars`): do not transfer them
+     through git, OneDrive or email. Send them to the person using
+     `python -m wsg secret`, a one-time link, and ask them to open it on the new
+     computer. If wsg is missing, install it following
      https://github.com/Wesports-Scandinavia-AB/wsg-cli/blob/main/INSTALL-FOR-CLAUDE.md
-   - **Mappar utan git eller utan remote**: fråga om de behövs. Behövs de, lägg
-     dem i ett privat GitHub-repo eller i OneDrive om de inte innehåller hemligheter.
-3. Kör kontrollen igen tills den slutar med **"Nothing lost"**. Säg först då att
-   datorn kan lämnas.
-4. Det **blå** är påminnelser. Claude-minnet per projekt kan kopieras till
-   `~/.claude/projects` på den nya datorn om personen vill. SSH-nycklarna
-   flyttas inte, se nästa punkt.
-5. **SSH**: när den nya datorn har en nyckel (bootstrap skriver ut den publika
-   delen) och personen ger dig den raden, lägg in den på servrarna härifrån med
-   den gamla nyckeln:
+   - **Folders without git or a remote**: ask whether they are needed. If so,
+     put them in a private GitHub repository, or in OneDrive if they contain
+     no secrets.
+3. Run the check again until it reports **"Nothing lost"**. Only then say the
+   computer can be handed over.
+4. The **blue** items are reminders. Per-project Claude memory can be copied to
+   `~/.claude/projects` on the new computer if the person wants. Do not transfer
+   SSH keys; see the next step.
+5. **SSH**: once the new computer has a key (bootstrap prints the public part)
+   and the person provides that line, add it to the servers from the old
+   computer using the old key:
 
    ```
-   ssh <användare>@<server> "echo '<publik nyckel>' >> ~/.ssh/authorized_keys"
+   ssh <user>@<server> "echo '<public key>' >> ~/.ssh/authorized_keys"
    ```
 
-   Användare och server hittar du i `~/.ssh/config` eller `~/.ssh/known_hosts`,
-   annars fråga. Be personen testa från den nya datorn, och ta sedan bort den
-   gamla datorns rad ur `authorized_keys` på servern.
+   Find the user and server in `~/.ssh/config` or `~/.ssh/known_hosts`, or ask
+   if necessary. Have the person test access from the new computer, then remove
+   the old computer's entry from `authorized_keys` on the server.
