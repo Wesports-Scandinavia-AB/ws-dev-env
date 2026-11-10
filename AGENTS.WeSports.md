@@ -89,3 +89,8 @@ installed copy. Read the current project's instructions for its conventions.
   in `~/.ws-dev-env.json`. Keep platform-specific procedures in those guides.
 - Add tools the whole team needs to ws-dev-env's `packages.json`; keep
   personal additions in the person's own environment layer.
+
+- For reviewing PRs, use `wesports-pr-review`: select repositories, show oldest
+  PRs first and ask whether to comment or fix and merge. Fix mode includes merging
+  after required review/checks, including the user's own PRs; comments mode never
+  changes code or merges. Refresh the queue and report remaining work after each PR.

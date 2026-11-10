@@ -5,6 +5,14 @@
 
 ### Added
 
+- Add `wesports-pr-review` for guided PR review in Claude and Codex: select projects,
+  review oldest first, choose comments or fixes plus merge, and see fresh progress
+  after every PR. Each PR uses an isolated worktree and independent review, shared
+  cross-machine claims, current head/base checks and resumable run state.
+- Add a preview-first tool updater for the declared Windows/Mac package channels,
+  including existing Codex and wsg installations. Preserve project-compatible
+  Python and pnpm channels rather than claiming every tool moves to the newest major.
+
 - Configure global Git ignores for local environment secret files on Windows
   and Mac, plus `.hidden`, while preserving existing excludes-file contents.
 - Add the `make-change` skill to guide people without programming experience
@@ -27,6 +35,11 @@
 - Update the TODO list to reflect the completed guided PR workflow, shared
   agent setup and version history, and clarify the remaining secrets and
   global Git configuration work.
+- Refresh all seven bundled Cloudflare skills from the official upstream snapshot
+  `cbf893b95422` and record the full source revision for reproducible updates.
+- Document how non-developers update ws-dev-env, synchronize both coding agents,
+  start PR review and resume a previous run.
+
 - Write repository documentation and agent instructions in English.
 - Focus shared agent guidance on helping non-developers build useful products,
   making safe changes, choosing clear UX patterns and verifying results.
@@ -265,3 +278,64 @@ this particular computer live.
    (Windows) or `bootstrap.sh` (Mac).
 3. SSH: add the new computer's public key to the servers from the old one,
    then remove the old one's.
+
+## Update an existing environment
+
+In Claude Code or Codex, ask:
+
+> Update my ws-dev-env to the latest main version, refresh shared instructions and
+> all skills for both agents, and check for updates to the managed tools. Preserve
+> my work and personal settings; run the commands yourself.
+
+The agent should find ws-dev-env through `~/.ws-dev-env.json`, inspect local changes,
+then fetch and fast-forward its main branch without discarding work. In the repository:
+
+```text
+git pull --ff-only
+python sync-instructions.py
+python sync-skills.py --with-wsg
+python scripts/update-tools.py
+```
+
+Use `python3` on Mac. The last command only previews targeted tool updates. When
+the user asks to update programs too, run it with `--apply`, then rerun
+`sync-skills.py --with-wsg` so the wsg skill matches the updated package. Start a
+new agent session after synchronization to reload instructions and skills.
+If a personal skill conflicts, preserve it and resolve the conflict explicitly.
+Do not overwrite it or claim synchronization succeeded after an error.
+
+The updater handles only packages declared by the shared/personal environment layers,
+not every program on the computer. Native tools follow their winget/Homebrew channels,
+Codex follows the declared npm package, and wsg uses its own updater. Python 3.12 and
+pnpm 9 remain compatibility channels; latest within a channel is not the newest major.
+The helper does not update project dependencies or pull every project repository.
+It stops on a real update error; successful checks on Windows do not prove a Mac
+installer was executed. For a fresh machine, use bootstrap first.
+
+## Review PRs without programming experience
+
+After updating and starting a new session, ask Claude Code or Codex:
+
+> Use wesports-pr-review to review our open PRs.
+
+The skill asks which projects, lists their PRs oldest first, and asks where to start
+and whether to only comment or also fix and merge. Fix mode includes merge when
+review and checks pass, including PRs by the requesting user. Arena merges deploy
+to production automatically; Data is left for manual deployment. Comments mode
+does not edit code or merge. No additional merge approval is requested in fix mode.
+
+Each PR gets an isolated worktree, independent review and relevant tests/user-flow
+verification. Shared claims coordinate colleagues on different computers. After each
+PR the agent refreshes GitHub, shows remaining/waiting work and names the next PR.
+Ask "continue where we left off" to resume saved choices and progress. Decisions
+are explained as business questions; Git/tool troubleshooting is handled by the agent.
+
+GitHub access, Python 3.10+, Git, GitHub CLI and independent agent tools are required.
+Posting coordination claims requires repository write access even in comments mode.
+The skill source is `claude/skills/wesports-pr-review`; user history stays outside Git.
+The bundled protocol tests run as part of the repository test suite.
+
+The seven third-party Cloudflare skill bundles are tracked against their official
+upstream revision in `scripts/skill-sources.json`; their license is preserved in
+`claude/skills/LICENSE.cloudflare`. They instruct agents to consult current official
+documentation rather than treating a stored snapshot as permanent API truth.

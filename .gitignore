@@ -5,3 +5,7 @@
 .dev.vars
 .dev.vars.*
 !.dev.vars.example
+
+# Generated Python caches
+__pycache__/
+*.py[cod]

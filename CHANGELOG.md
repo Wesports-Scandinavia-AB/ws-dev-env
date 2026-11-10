@@ -8,6 +8,14 @@ it does not imply that a release or tag has been published.
 
 ### Added
 
+- Add `wesports-pr-review` for guided PR review in Claude and Codex: select projects,
+  review oldest first, choose comments or fixes plus merge, and see fresh progress
+  after every PR. Each PR uses an isolated worktree and independent review, shared
+  cross-machine claims, current head/base checks and resumable run state.
+- Add a preview-first tool updater for the declared Windows/Mac package channels,
+  including existing Codex and wsg installations. Preserve project-compatible
+  Python and pnpm channels rather than claiming every tool moves to the newest major.
+
 - Configure global Git ignores for local environment secret files on Windows
   and Mac, plus `.hidden`, while preserving existing excludes-file contents.
 - Add the `make-change` skill to guide people without programming experience
@@ -30,6 +38,11 @@ it does not imply that a release or tag has been published.
 - Update the TODO list to reflect the completed guided PR workflow, shared
   agent setup and version history, and clarify the remaining secrets and
   global Git configuration work.
+- Refresh all seven bundled Cloudflare skills from the official upstream snapshot
+  `cbf893b95422` and record the full source revision for reproducible updates.
+- Document how non-developers update ws-dev-env, synchronize both coding agents,
+  start PR review and resume a previous run.
+
 - Write repository documentation and agent instructions in English.
 - Focus shared agent guidance on helping non-developers build useful products,
   making safe changes, choosing clear UX patterns and verifying results.

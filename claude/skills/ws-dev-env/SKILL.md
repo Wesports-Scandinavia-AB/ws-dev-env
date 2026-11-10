@@ -37,7 +37,8 @@ usually `~/source/repos/ws-dev-env`.
 
 ## Updating
 
-Run `git pull` in ws-dev-env, then run `bootstrap.ps1` again. Existing
+Inspect local changes first, then use `git pull --ff-only` in ws-dev-env.
+Never discard work to update. Run `bootstrap.ps1` again for missing installations. Existing
 installations are skipped and shared instructions are refreshed. `-DryRun`
 shows what would happen without making changes.
 
@@ -51,6 +52,15 @@ on Mac). Every shared and personal skill is installed for each coding agent
 declared with `skill_dir` in `packages.json`. The `wsg` skill is refreshed
 from the installed package. Resolve any reported name conflict rather than
 overwriting a person's existing skill.
+
+To update already-installed managed programs, preview with
+`python scripts/update-tools.py` (`python3` on Mac), then run with `--apply` when
+the user requested program updates. The updater targets only declared package
+channels, including existing Codex and wsg. It preserves Python 3.12 and pnpm 9
+compatibility channels; do not claim it installs every newest major. After wsg
+updates, rerun `sync-skills.py --with-wsg`. Start a new agent session afterwards.
+Run the commands yourself and explain any access, local-change or skill conflicts
+without asking a non-developer to resolve Git internals. Follow README's update guide.
 
 ## Sharing with everyone
 

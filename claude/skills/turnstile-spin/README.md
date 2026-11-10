@@ -2,7 +2,7 @@
 
 End-to-end setup skill for Cloudflare Turnstile. Loads when an agent is asked to add Turnstile, set up CAPTCHA, or protect a form from bots.
 
-`SKILL.md` is the canonical machine-readable behavior. The hosted prompt at [`developers.cloudflare.com/turnstile/spin/prompt.md`](https://developers.cloudflare.com/turnstile/spin/prompt.md) packages the same behavior for agents that do not have this bundle installed. Product requirements come from the [Turnstile documentation](https://developers.cloudflare.com/turnstile/).
+`SKILL.md` is the canonical machine-readable behavior. The hosted prompt at [`developers.cloudflare.com/turnstile/spin/prompt.md`](https://developers.cloudflare.com/turnstile/spin/prompt.md) packages the same behavior for agents that do not have this bundle installed. Product requirements come from the [Turnstile documentation](https://developers.cloudflare.com/turnstile/index.md).
 
 ## Layout
 
@@ -19,6 +19,7 @@ End-to-end setup skill for Cloudflare Turnstile. Loads when an agent is asked to
 | `references/astro.md`             | Code snippet for Astro projects                                        |
 | `references/sveltekit.md`         | Code snippet for SvelteKit projects                                    |
 | `references/hugo.md`              | Code snippet for Hugo projects                                         |
+| `references/skill-feedback.md`    | Steps for reporting problems with this skill to its maintainers        |
 | `tests/validation.md`             | Validation cases matching the assertions in the PRD                    |
 
 ## How agents load it
@@ -46,6 +47,6 @@ Any behavioral change to `SKILL.md` must also be applied to `public/turnstile/sp
 
 ## Related
 
-- [Canonical docs page](https://developers.cloudflare.com/turnstile/spin/)
+- [Canonical docs page](https://developers.cloudflare.com/turnstile/spin/index.md)
 - [`cloudflare/skills`](https://github.com/cloudflare/skills) — root index for all Cloudflare agent skills
-- [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/) — canonical siteverify reference
+- [Turnstile server-side validation](https://developers.cloudflare.com/turnstile/get-started/server-side-validation/index.md) — canonical siteverify reference

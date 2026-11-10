@@ -1,0 +1,16 @@
+{
+  "cloudflare": {
+    "repository": "https://github.com/cloudflare/skills",
+    "commit": "cbf893b954222276bf1af57e5f23379231e0efb9",
+    "verifiedOn": "2026-11-10",
+    "skills": [
+      "agents-sdk",
+      "cloudflare",
+      "cloudflare-email-service",
+      "durable-objects",
+      "turnstile-spin",
+      "workers-best-practices",
+      "wrangler"
+    ]
+  }
+}
