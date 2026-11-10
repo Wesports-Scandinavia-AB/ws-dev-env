@@ -24,6 +24,9 @@
 
 ### Changed
 
+- Update the TODO list to reflect the completed guided PR workflow, shared
+  agent setup and version history, and clarify the remaining secrets and
+  global Git configuration work.
 - Write repository documentation and agent instructions in English.
 - Focus shared agent guidance on helping non-developers build useful products,
   making safe changes, choosing clear UX patterns and verifying results.
